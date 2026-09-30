@@ -1,6 +1,6 @@
 import { gameState } from "./state.js";
 
-const SAVE_KEY = "cria_un_arturito_save";
+const SAVE_KEY = "cria_un_arturito_save_v1";
 
 export function saveGame() {
 
@@ -8,22 +8,19 @@ export function saveGame() {
         SAVE_KEY,
         JSON.stringify(gameState)
     );
-
 }
 
 export function loadGame() {
 
-    const saved = localStorage.getItem(SAVE_KEY);
+    const data = localStorage.getItem(SAVE_KEY);
 
-    if (!saved) {
-        return false;
-    }
+    if (!data) return false;
 
     try {
 
-        const data = JSON.parse(saved);
+        const parsed = JSON.parse(data);
 
-        Object.assign(gameState, data);
+        Object.assign(gameState, parsed);
 
         return true;
 
@@ -39,7 +36,9 @@ export function loadGame() {
 }
 
 export function deleteSave() {
-
     localStorage.removeItem(SAVE_KEY);
+}
 
+export function hasSave() {
+    return localStorage.getItem(SAVE_KEY) !== null;
 }
