@@ -1,63 +1,66 @@
 import { gameState } from "./state.js";
-import { loadGame } from "./save.js";
-import { startPrologue } from "./scenes.js";
+import { loadGame, saveGame } from "./save.js";
+import { actions } from "./actions.js";
+import { scenes } from "./scenes.js";
+import { updateMood } from "./character.js";
 
+export function startGame() {
 
-export function updateStats() {
+    gameState.started = true;
 
-    document.getElementById("age").textContent =
-        gameState.age;
+    updateMood();
 
-    document.getElementById("hunger").textContent =
-        clamp(gameState.hunger);
+    saveGame();
 
-    document.getElementById("happiness").textContent =
-        clamp(gameState.happiness);
-
-    document.getElementById("intelligence").textContent =
-        clamp(gameState.intelligence);
-
-    document.getElementById("stupidity").textContent =
-        clamp(gameState.stupidity);
-
-    document.getElementById("money").textContent =
-        Math.max(0, gameState.money);
-
+    console.log("Cría un Arturito iniciado.");
 }
 
+export function performAction(actionName, ...args) {
 
-function clamp(value) {
+    const action = actions[actionName];
 
-    return Math.max(
-        0,
-        Math.min(100, Math.round(value))
-    );
+    if (!action) {
+        console.error(
+            `Acción desconocida: ${actionName}`
+        );
 
-}
-
-
-function startGame() {
-
-    const loaded = loadGame();
-
-    updateStats();
-
-    if (loaded && gameState.started) {
-
-        /*
-         * De momento comenzamos desde la primera
-         * escena jugable mientras construimos
-         * el sistema de continuar.
-         */
-
-        startPrologue();
-
-        return;
+        return null;
     }
 
-    startPrologue();
+    const result = action(...args);
 
+    updateMood();
+
+    saveGame();
+
+    return result;
 }
 
+export function getScene(sceneId) {
 
-startGame();
+    return scenes[sceneId] ?? null;
+}
+
+export function getState() {
+    return gameState;
+}
+
+export function continueGame() {
+
+    if (loadGame()) {
+        updateMood();
+        return true;
+    }
+
+    startGame();
+
+    return false;
+}
+
+window.ArturitoGame = {
+    startGame,
+    continueGame,
+    performAction,
+    getScene,
+    getState
+};
