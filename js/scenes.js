@@ -1,407 +1,170 @@
-import { gameState } from "./state.js";
-import { showDialogue, showChoices } from "./dialogue.js";
-import { saveGame } from "./save.js";
-import { updateStats } from "./main.js";
-
-
-export function startPrologue() {
-
-    showDialogue(
-        "",
-        "Algo ha tocado tu puerta.",
-        () => {
-
-            showDialogue(
-                "",
-                "TOC. TOC. TOC.",
-                () => {
-
-                    showDialogue(
-                        "",
-                        "Miras el reloj. Son las 02:17 AM.",
-                        () => {
-
-                            showDialogue(
-                                "",
-                                "Vuelves a escuchar el golpe.",
-                                () => {
-
-                                    showDialogue(
-                                        "",
-                                        "TOC. TOC.",
-                                        () => {
-
-                                            openDoor();
-
-                                        }
-                                    );
-
-                                }
-                            );
-
-                        }
-                    );
-
-                }
-            );
-
-        }
-    );
-
-}
-
-
-function openDoor() {
-
-    showDialogue(
-        "",
-        "Abres la puerta.",
-        () => {
-
-            showDialogue(
-                "",
-                "Hay una pequeña caja frente a tu casa.",
-                () => {
-
-                    showDialogue(
-                        "",
-                        "Dentro hay un bebé.",
-                        () => {
-
-                            showDialogue(
-                                "",
-                                "Junto al bebé hay una nota.",
-                                () => {
-
-                                    showDialogue(
-                                        "",
-                                        "\"Se llama Arturito.\"",
-                                        () => {
-
-                                            meetBaby();
-
-                                        }
-                                    );
-
-                                }
-                            );
-
-                        }
-                    );
-
-                }
-            );
-
-        }
-    );
-
-}
-
-
-function meetBaby() {
-
-    showDialogue(
-        "Tú",
-        "...¿Arturito?",
-        () => {
-
-            showDialogue(
-                "Arturito",
-                "Gugugu.",
-                () => {
-
-                    showDialogue(
-                        "",
-                        "El bebé te mira fijamente.",
-                        () => {
-
-                            showChoices([
-
-                                {
-                                    text: "Recogerlo",
-
-                                    action: () => {
-
-                                        timeSkip();
-
-                                    }
-                                },
-
-                                {
-                                    text: "Mirar la nota otra vez",
-
-                                    action: () => {
-
-                                        showDialogue(
-                                            "",
-                                            "La nota solamente dice: \"Se llama Arturito.\"",
-                                            () => meetBaby()
-                                        );
-
-                                    }
-                                }
-
-                            ]);
-
-                        }
-                    );
-
-                }
-            );
-
-        }
-    );
-
-}
-
-
-function timeSkip() {
-
-    showDialogue(
-        "",
-        "No sabes exactamente cómo ocurrió.",
-        () => {
-
-            showDialogue(
-                "",
-                "Pero ocho años después...",
-                () => {
-
-                    gameState.started = true;
-
-                    gameState.age = 8;
-
-                    gameState.scene = "kitchen";
-
-                    saveGame();
-
-                    updateStats();
-
-                    firstMorning();
-
-                }
-            );
-
-        }
-    );
-
-}
-
-
-function firstMorning() {
-
-    showDialogue(
-        "Arturito",
-        "¡YA DESPERTÉ!",
-        () => {
-
-            showDialogue(
-                "Tú",
-                "¿Qué estás haciendo?",
-                () => {
-
-                    showDialogue(
-                        "Arturito",
-                        "Estoy pensando.",
-                        () => {
-
-                            showDialogue(
-                                "Tú",
-                                "¿En qué?",
-                                () => {
-
-                                    showDialogue(
-                                        "Arturito",
-                                        "No sé.",
-                                        () => {
-
-                                            showDialogue(
-                                                "",
-                                                "Arturito lleva aproximadamente veinte minutos mirando una cuchara.",
-                                                () => {
-
-                                                    firstChoice();
-
-                                                }
-                                            );
-
-                                        }
-                                    );
-
-                                }
-                            );
-
-                        }
-                    );
-
-                }
-            );
-
-        }
-    );
-
-}
-
-
-function firstChoice() {
-
-    showChoices([
-
-        {
-            text: "Preguntarle qué hace",
-
-            action: () => {
-
-                showDialogue(
-                    "Tú",
-                    "¿Por qué estás mirando la cuchara?",
-                    () => {
-
-                        showDialogue(
-                            "Arturito",
-                            "Estoy intentando descubrir cómo funciona.",
-                            () => {
-
-                                showDialogue(
-                                    "Tú",
-                                    "Es una cuchara.",
-                                    () => {
-
-                                        showDialogue(
-                                            "Arturito",
-                                            "Exactamente.",
-                                            () => {
-
-                                                gameState.stupidity += 2;
-
-                                                updateStats();
-
-                                                saveGame();
-
-                                                startDay();
-
-                                            }
-                                        );
-
-                                    }
-                                );
-
-                            }
-                        );
-
-                    }
-                );
-
+export const scenes = {
+
+    breakfast: {
+        speaker: "Arturito",
+
+        text: "Gracias. Aunque esperaba algo más interesante.",
+
+        choices: [
+            {
+                text: "¿Qué quieres decir con interesante?",
+                next: "food_argument"
+            },
+            {
+                text: "Come y ya.",
+                next: "eat"
             }
-        },
+        ]
+    },
 
-        {
-            text: "Dejarlo tranquilo",
+    cheap_breakfast: {
+        speaker: "Arturito",
 
-            action: () => {
+        text: "¿Cinco pesos? Esto tiene una relación calidad-precio cuestionable.",
 
-                gameState.happiness += 2;
-
-                updateStats();
-
-                saveGame();
-
-                startDay();
-
+        choices: [
+            {
+                text: "Es comida.",
+                next: "eat"
+            },
+            {
+                text: "Entonces no comas.",
+                next: "ignore"
             }
-        }
+        ]
+    },
 
-    ]);
+    ignored_food: {
+        speaker: "Arturito",
 
-}
+        text: "Ok.",
 
+        choices: [
+            {
+                text: "¿No vas a decir nada?",
+                next: "silent"
+            }
+        ]
+    },
 
-function startDay() {
+    talk: {
+        speaker: "Arturito",
 
-    showDialogue(
-        "",
-        "DÍA 1",
-        () => {
+        text: "¿Sabías que técnicamente una cuchara es una herramienta especializada?",
 
-            showDialogue(
-                "",
-                "Tu nueva vida con Arturito acaba de comenzar.",
-                () => {
+        choices: [
+            {
+                text: "No empieces.",
+                next: "spoon"
+            },
+            {
+                text: "Explícame.",
+                next: "spoon"
+            }
+        ]
+    },
 
-                    showDialogue(
-                        "Arturito",
-                        "¿Hay desayuno?",
-                        () => {
+    spoon: {
+        speaker: "Arturito",
 
-                            showChoices([
+        text: "Exactamente. Sabía que entenderías.",
 
-                                {
-                                    text: "Prepararle desayuno",
+        choices: []
+    },
 
-                                    action: () => {
+    play: {
+        speaker: "Arturito",
 
-                                        gameState.hunger += 10;
-                                        gameState.money -= 10;
+        text: "Ganaste porque te dejé.",
 
-                                        updateStats();
+        choices: [
+            {
+                text: "Claro.",
+                next: "play2"
+            },
+            {
+                text: "Perdí contra ti.",
+                next: "play2"
+            }
+        ]
+    },
 
-                                        saveGame();
+    play2: {
+        speaker: "Arturito",
 
-                                        showDialogue(
-                                            "Arturito",
-                                            "Gracias.",
-                                            () => {
+        text: "No importa cuál de las dos dijiste. Gané.",
 
-                                                showDialogue(
-                                                    "",
-                                                    "Arturito se come el desayuno.",
-                                                    null
-                                                );
+        choices: []
+    },
 
-                                            }
-                                        );
+    insult: {
+        speaker: "Arturito",
 
-                                    }
-                                },
+        text: "¿Eso fue un insulto o una descripción?",
 
-                                {
-                                    text: "Decirle que no hay",
+        choices: [
+            {
+                text: "Un insulto.",
+                next: "insult2"
+            },
+            {
+                text: "Una descripción.",
+                next: "insult3"
+            }
+        ]
+    },
 
-                                    action: () => {
+    insult2: {
+        speaker: "Arturito",
 
-                                        gameState.hunger -= 10;
-                                        gameState.happiness -= 3;
+        text: "Entonces te esforzaste para decir algo que ya sabíamos.",
 
-                                        updateStats();
+        choices: []
+    },
 
-                                        saveGame();
+    insult3: {
+        speaker: "Arturito",
 
-                                        showDialogue(
-                                            "Arturito",
-                                            "Ah.",
-                                            () => {
+        text: "Ah. Entonces gracias por la información.",
 
-                                                showDialogue(
-                                                    "",
-                                                    "Arturito abre una bolsa de cereal que encontró.",
-                                                    null
-                                                );
+        choices: []
+    },
 
-                                            }
-                                        );
+    computer: {
+        speaker: "Arturito",
 
-                                    }
-                                }
+        text: "¿ES MÍA?",
 
-                            ]);
+        choices: [
+            {
+                text: "Sí.",
+                next: "computer2"
+            }
+        ]
+    },
 
-                        }
-                    );
+    computer2: {
+        speaker: "Arturito",
 
-                }
-            );
+        text: "Voy a instalar Linux.",
 
-        }
-    );
+        choices: [
+            {
+                text: "Ni se te ocurra.",
+                next: "linux"
+            },
+            {
+                text: "¿Qué es Linux?",
+                next: "linux"
+            }
+        ]
+    },
 
-}
+    linux: {
+        speaker: "Arturito",
+
+        text: "No importa. Ya empezó la instalación.",
+
+        choices: []
+    }
+};
