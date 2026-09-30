@@ -1,139 +1,1069 @@
+/* =========================================
+   BASE
+========================================= */
+
 * {
     box-sizing: border-box;
-}
-
-body {
     margin: 0;
-    background: #111;
-    color: white;
-    font-family: Arial, sans-serif;
+    padding: 0;
 }
 
-#game {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+:root {
+    --black: #08090b;
+    --panel: rgba(12, 14, 17, .94);
+    --panel-light: rgba(25, 28, 33, .92);
+
+    --text: #f1f3f5;
+    --muted: #9298a1;
+
+    --accent: #e7e9ec;
+    --border: rgba(255, 255, 255, .10);
+
+    --danger: #d95c5c;
+    --happy: #7fcf91;
+    --energy: #77a9e8;
 }
 
-#scene {
-    position: relative;
-    min-height: 70vh;
-    background: #202020;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
+html,
+body {
+    width: 100%;
+    height: 100%;
     overflow: hidden;
 }
 
+body {
+    background: #050608;
+    color: var(--text);
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    user-select: none;
+}
+
+
+/* =========================================
+   GAME
+========================================= */
+
+#game {
+    position: relative;
+
+    width: 100vw;
+    height: 100vh;
+
+    overflow: hidden;
+
+    background: #050608;
+}
+
+
+/* =========================================
+   ESCENA
+========================================= */
+
+#scene {
+    position: absolute;
+
+    inset: 0;
+
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 35%,
+            #252932 0%,
+            #12151a 45%,
+            #07080a 100%
+        );
+}
+
+
+/* =========================================
+   BACKGROUND
+========================================= */
+
 #background {
     position: absolute;
+
+    inset: 0;
+
+    background-size: cover;
+    background-position: center;
+
+    transition:
+        opacity .5s ease,
+        transform 1s ease,
+        filter .5s ease;
+
+    z-index: 0;
+}
+
+
+/* Oscuridad cinematográfica */
+
+#scene-overlay {
+    position: absolute;
+
     inset: 0;
 
     background:
         linear-gradient(
-            rgba(0,0,0,.15),
-            rgba(0,0,0,.45)
-        ),
-        #292929;
+            to bottom,
+            rgba(0, 0, 0, .35),
+            transparent 35%,
+            rgba(0, 0, 0, .75)
+        );
+
+    pointer-events: none;
+
+    z-index: 1;
+}
+
+
+/* =========================================
+   HUD SUPERIOR
+========================================= */
+
+#top-hud {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 80px;
+
+    padding:
+        22px
+        28px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    z-index: 10;
+
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(0,0,0,.65),
+            transparent
+        );
+}
+
+.hud-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.day-display {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.time-display {
+    color: var(--muted);
+
+    font-size: 12px;
+
+    letter-spacing: 1px;
+}
+
+.hud-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.money {
+    padding: 9px 13px;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    background: rgba(10, 11, 13, .7);
+
+    backdrop-filter: blur(10px);
+
+    font-size: 14px;
+}
+
+.hud-label {
+    color: var(--muted);
+
+    margin-right: 4px;
+}
+
+
+/* =========================================
+   BOTÓN MENÚ
+========================================= */
+
+.icon-button {
+    width: 40px;
+    height: 40px;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    background: rgba(10, 11, 13, .7);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    gap: 4px;
+
+    cursor: pointer;
+
+    transition:
+        background .2s,
+        transform .2s;
+}
+
+.icon-button:hover {
+    background: rgba(255,255,255,.12);
+}
+
+.icon-button:active {
+    transform: scale(.94);
+}
+
+.icon-button span {
+    width: 15px;
+    height: 1px;
+
+    background: #fff;
+}
+
+
+/* =========================================
+   PERSONAJE
+========================================= */
+
+#character-area {
+    position: absolute;
+
+    inset: 80px 0 260px;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+
+    z-index: 3;
 }
 
 #character {
     position: relative;
-    z-index: 2;
 
-    width: 260px;
-    height: 320px;
+    width: min(420px, 50vw);
+    height: 75%;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+
+    transition:
+        transform .35s ease,
+        opacity .35s ease;
+}
+
+#character-sprite {
+    display: none;
+
+    max-width: 100%;
+    max-height: 100%;
+
+    object-fit: contain;
+
+    image-rendering: auto;
+}
+
+
+/* Placeholder mientras no pongas sprite */
+
+#character-placeholder {
+    width: 170px;
+    height: 260px;
+
+    border-radius: 85px 85px 25px 25px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #383d45,
+            #17191e
+        );
+
+    border: 1px solid rgba(255,255,255,.12);
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    margin-bottom: 180px;
+    color: rgba(255,255,255,.25);
+
+    font-size: 12px;
+    letter-spacing: 2px;
 }
 
-/*
-Cuando tengas sprites podremos hacer:
 
-#character img {
-    max-width: 100%;
-    max-height: 100%;
-}
-*/
+/* Sombra */
 
-#dialogue-box {
+#character-shadow {
     position: absolute;
 
-    left: 5%;
-    right: 5%;
-    bottom: 25px;
+    left: 50%;
+    bottom: 245px;
 
-    z-index: 5;
+    width: 240px;
+    height: 35px;
 
-    padding: 20px;
+    transform: translateX(-50%);
 
-    background: rgba(10, 10, 10, .94);
-    border: 2px solid #444;
-    border-radius: 12px;
+    border-radius: 50%;
+
+    background: rgba(0,0,0,.5);
+
+    filter: blur(14px);
+
+    z-index: 2;
+}
+
+
+/* =========================================
+   CHARACTER STATUS
+========================================= */
+
+#character-status {
+    position: absolute;
+
+    left: 50%;
+    bottom: 265px;
+
+    transform: translateX(-50%);
+
+    text-align: center;
+
+    z-index: 6;
+
+    pointer-events: none;
+}
+
+.status-name {
+    font-size: 11px;
+
+    font-weight: 800;
+
+    letter-spacing: 3px;
+}
+
+.status-mood {
+    margin-top: 5px;
+
+    font-size: 9px;
+
+    letter-spacing: 2px;
+
+    color: var(--muted);
+}
+
+
+/* =========================================
+   DIALOGUE
+========================================= */
+
+#dialogue-container {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    padding:
+        0
+        28px
+        25px;
+
+    z-index: 8;
+}
+
+#dialogue-box {
+    width: min(900px, 100%);
+
+    min-height: 170px;
+
+    margin: 0 auto;
+
+    padding: 22px 25px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.12);
+
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(17,19,23,.97),
+            rgba(7,8,10,.97)
+        );
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.45);
+
+    backdrop-filter: blur(16px);
 }
 
 #speaker {
-    font-weight: bold;
     margin-bottom: 10px;
-    color: #ddd;
+
+    color: #fff;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    letter-spacing: 2px;
 }
 
 #dialogue-text {
-    min-height: 50px;
-    line-height: 1.5;
+    min-height: 55px;
+
+    max-width: 780px;
+
+    color: #e5e7ea;
+
+    font-size: 17px;
+    line-height: 1.6;
 }
 
-#choices {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+#dialogue-actions {
     margin-top: 15px;
 }
 
-button {
-    border: 0;
-    padding: 12px 18px;
-    border-radius: 8px;
 
-    background: #ddd;
-    color: #111;
+/* =========================================
+   CHOICES
+========================================= */
+
+#choices {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 8px;
+
+    margin-bottom: 10px;
+}
+
+.choice-button,
+.continue-button,
+.action-button,
+.menu-window button,
+.inventory-window button,
+.ending-window button {
+    border: 1px solid var(--border);
+
+    border-radius: 10px;
+
+    background:
+        rgba(255,255,255,.045);
+
+    color: var(--text);
 
     cursor: pointer;
 
-    font-size: 15px;
+    font: inherit;
+
+    transition:
+        background .2s,
+        border-color .2s,
+        transform .15s;
 }
 
-button:hover {
-    background: white;
+.choice-button {
+    padding: 12px;
+
+    text-align: left;
+
+    font-size: 13px;
 }
 
-#continue-btn {
-    margin-top: 15px;
+.choice-button:hover,
+.continue-button:hover,
+.action-button:hover,
+.menu-window button:hover,
+.inventory-window button:hover,
+.ending-window button:hover {
+    background:
+        rgba(255,255,255,.10);
+
+    border-color:
+        rgba(255,255,255,.22);
 }
 
-#stats {
-    padding: 20px;
-    background: #181818;
+.choice-button:active,
+.continue-button:active,
+.action-button:active,
+.menu-window button:active,
+.inventory-window button:active,
+.ending-window button:active {
+    transform: scale(.98);
 }
 
-#stats h2 {
-    margin-top: 0;
+
+.continue-button {
+    padding: 9px 15px;
+
+    font-size: 11px;
+
+    letter-spacing: 1px;
+
+    float: right;
 }
+
+
+/* =========================================
+   STATS PANEL
+========================================= */
+
+#stats-panel {
+    position: absolute;
+
+    top: 95px;
+    right: 20px;
+
+    width: 250px;
+
+    padding: 18px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.09);
+
+    border-radius: 15px;
+
+    background:
+        rgba(8,9,11,.88);
+
+    backdrop-filter: blur(18px);
+
+    box-shadow:
+        0 20px 50px rgba(0,0,0,.35);
+
+    z-index: 12;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 18px;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    letter-spacing: 2px;
+}
+
+.panel-header small {
+    color: var(--muted);
+
+    font-size: 9px;
+
+    letter-spacing: 1px;
+}
+
+
+/* =========================================
+   BARRAS
+========================================= */
 
 .stat {
+    margin-bottom: 13px;
+}
+
+.stat-top {
     display: flex;
     justify-content: space-between;
 
-    max-width: 400px;
+    margin-bottom: 6px;
 
-    margin: 8px 0;
+    font-size: 10px;
+
+    color: var(--muted);
 }
 
-.money {
-    margin-top: 20px;
-    font-size: 20px;
+.stat-top strong {
+    color: var(--text);
+
+    font-size: 10px;
+}
+
+.bar {
+    width: 100%;
+    height: 5px;
+
+    overflow: hidden;
+
+    border-radius: 10px;
+
+    background: rgba(255,255,255,.08);
+}
+
+.bar-fill {
+    width: 50%;
+    height: 100%;
+
+    border-radius: inherit;
+
+    transition: width .4s ease;
+}
+
+.bar-fill.hunger {
+    background: var(--danger);
+}
+
+.bar-fill.happiness {
+    background: var(--happy);
+}
+
+.bar-fill.energy {
+    background: var(--energy);
+}
+
+
+/* =========================================
+   GRID DE ESTADÍSTICAS
+========================================= */
+
+.stat-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 8px;
+}
+
+.small-stat {
+    padding: 10px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.06);
+
+    border-radius: 9px;
+
+    background:
+        rgba(255,255,255,.025);
+}
+
+.small-stat span {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: var(--muted);
+
+    font-size: 8px;
+
+    letter-spacing: .5px;
+}
+
+.small-stat strong {
+    font-size: 14px;
+}
+
+
+/* =========================================
+   SEPARADORES
+========================================= */
+
+.separator {
+    height: 1px;
+
+    margin: 17px 0;
+
+    background:
+        rgba(255,255,255,.07);
+}
+
+
+/* =========================================
+   QUICK ACTIONS
+========================================= */
+
+#quick-actions {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+.action-button {
+    width: 100%;
+
+    padding: 10px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    font-size: 10px;
+
+    text-align: left;
+}
+
+.action-icon {
+    width: 19px;
+    height: 19px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 5px;
+
+    background:
+        rgba(255,255,255,.07);
+
+    font-size: 10px;
+}
+
+
+/* =========================================
+   RELACIÓN
+========================================= */
+
+.relationship-title {
+    margin-bottom: 10px;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+}
+
+.relationship-row {
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-bottom: 7px;
+
+    font-size: 9px;
+
+    color: var(--muted);
+}
+
+.relationship-row strong {
+    color: var(--text);
+}
+
+
+/* =========================================
+   OVERLAYS
+========================================= */
+
+.overlay {
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 100;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background:
+        rgba(0,0,0,.72);
+
+    backdrop-filter: blur(12px);
+
+    opacity: 1;
+
+    transition: opacity .25s ease;
+}
+
+.overlay.hidden {
+    opacity: 0;
+
+    pointer-events: none;
+}
+
+
+/* =========================================
+   MENÚ
+========================================= */
+
+.menu-window,
+.inventory-window,
+.ending-window {
+    width: min(400px, calc(100% - 40px));
+
+    padding: 25px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.12);
+
+    border-radius: 17px;
+
+    background:
+        rgba(13,15,18,.97);
+
+    box-shadow:
+        0 30px 80px rgba(0,0,0,.6);
+}
+
+.menu-title {
+    margin-bottom: 20px;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    letter-spacing: 3px;
+}
+
+.menu-window button,
+.inventory-window button {
+    width: 100%;
+
+    padding: 13px;
+
+    margin-top: 8px;
+
+    font-size: 11px;
+}
+
+
+/* =========================================
+   INVENTARIO
+========================================= */
+
+#inventory-list {
+    max-height: 350px;
+
+    overflow-y: auto;
+
+    margin-bottom: 15px;
+}
+
+.empty-inventory {
+    padding: 30px 10px;
+
+    text-align: center;
+
+    color: var(--muted);
+
+    font-size: 12px;
+}
+
+
+/* =========================================
+   FINAL
+========================================= */
+
+.ending-window {
+    text-align: center;
+}
+
+.ending-small {
+    margin-bottom: 15px;
+
+    color: var(--muted);
+
+    font-size: 9px;
+
+    letter-spacing: 3px;
+}
+
+#ending-title {
+    margin-bottom: 15px;
+
+    font-size: 30px;
+
+    letter-spacing: 2px;
+}
+
+#ending-text {
+    margin-bottom: 25px;
+
+    color: #b7bbc1;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+.ending-window button {
+    width: 100%;
+
+    padding: 13px;
+
+    font-size: 11px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 900px) {
+
+    #stats-panel {
+        display: none;
+    }
+
+    #character-area {
+        inset-bottom: 240px;
+    }
+
+    #character {
+        width: 55vw;
+    }
+
+    #dialogue-container {
+        padding: 0 14px 14px;
+    }
+
+    #dialogue-box {
+        min-height: 155px;
+
+        padding: 18px;
+    }
+
+    #dialogue-text {
+        font-size: 15px;
+    }
+
+    #choices {
+        grid-template-columns: 1fr;
+    }
+
+    #top-hud {
+        padding: 17px;
+    }
+}
+
+
+@media (max-width: 500px) {
+
+    #character-area {
+        inset: 70px 0 250px;
+    }
+
+    #character {
+        height: 65%;
+    }
+
+    #character-placeholder {
+        width: 130px;
+        height: 210px;
+    }
+
+    #character-status {
+        bottom: 250px;
+    }
+
+    #dialogue-box {
+        min-height: 175px;
+    }
+
+    #dialogue-text {
+        font-size: 14px;
+
+        line-height: 1.5;
+    }
+
+    .money {
+        padding: 8px 10px;
+    }
+}
+
+
+/* =========================================
+   ANIMACIONES
+========================================= */
+
+@keyframes characterEnter {
+
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.character-enter {
+    animation:
+        characterEnter
+        .5s
+        ease
+        both;
+}
+
+
+@keyframes dialogueEnter {
+
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dialogue-enter {
+    animation:
+        dialogueEnter
+        .3s
+        ease
+        both;
+}
+
+
+@keyframes fadeIn {
+
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation:
+        fadeIn
+        .5s
+        ease
+        both;
 }
