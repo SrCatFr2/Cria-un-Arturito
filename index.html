@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     >
 
     <title>Cría un Arturito</title>
@@ -16,66 +16,413 @@
 
     <main id="game">
 
+        <!-- =========================================
+             ESCENA
+        ========================================== -->
+
         <section id="scene">
 
             <div id="background"></div>
 
-            <div id="character">
-                <!-- Aquí posteriormente irán tus sprites -->
+            <div id="scene-overlay"></div>
+
+            <!-- Hora / día -->
+
+            <header id="top-hud">
+
+                <div class="hud-left">
+                    <div class="day-display">
+                        DÍA <span id="day">1</span>
+                    </div>
+
+                    <div class="time-display">
+                        <span id="time">08:00</span>
+                    </div>
+                </div>
+
+                <div class="hud-right">
+
+                    <div class="money">
+                        <span class="hud-label">$</span>
+                        <span id="money">120</span>
+                    </div>
+
+                    <button
+                        id="menu-button"
+                        class="icon-button"
+                        aria-label="Abrir menú"
+                    >
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+
+                </div>
+
+            </header>
+
+
+            <!-- =========================================
+                 PERSONAJE
+            ========================================== -->
+
+            <div id="character-area">
+
+                <div id="character-shadow"></div>
+
+                <div id="character">
+
+                    <!-- Aquí irá posteriormente tu sprite -->
+
+                    <img
+                        id="character-sprite"
+                        src=""
+                        alt="Arturito"
+                    >
+
+                    <div id="character-placeholder">
+                        ARTURITO
+                    </div>
+
+                </div>
+
             </div>
 
-            <div id="dialogue-box">
 
-                <div id="speaker"></div>
+            <!-- =========================================
+                 INFORMACIÓN DEL PERSONAJE
+            ========================================== -->
 
-                <div id="dialogue-text"></div>
+            <div id="character-status">
 
-                <div id="choices"></div>
+                <div class="status-name">
+                    ARTURITO
+                </div>
 
-                <button id="continue-btn">
-                    Continuar
+                <div
+                    id="mood"
+                    class="status-mood"
+                >
+                    NORMAL
+                </div>
+
+            </div>
+
+
+            <!-- =========================================
+                 CAJA DE DIÁLOGO
+            ========================================== -->
+
+            <section id="dialogue-container">
+
+                <div id="dialogue-box">
+
+                    <div id="speaker">
+                        ARTURITO
+                    </div>
+
+                    <div id="dialogue-text">
+                        ...
+                    </div>
+
+                    <div id="dialogue-actions">
+
+                        <div id="choices"></div>
+
+                        <button
+                            id="continue-button"
+                            class="continue-button"
+                        >
+                            CONTINUAR
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </section>
+
+
+        <!-- =========================================
+             PANEL DE ESTADÍSTICAS
+        ========================================== -->
+
+        <aside id="stats-panel">
+
+            <div class="panel-header">
+                <span>ARTURITO</span>
+                <small id="age-display">8 AÑOS</small>
+            </div>
+
+
+            <div class="stat-section">
+
+                <div class="stat">
+                    <div class="stat-top">
+                        <span>Hambre</span>
+                        <strong id="hunger-value">70</strong>
+                    </div>
+
+                    <div class="bar">
+                        <div
+                            id="hunger-bar"
+                            class="bar-fill hunger"
+                        ></div>
+                    </div>
+                </div>
+
+
+                <div class="stat">
+                    <div class="stat-top">
+                        <span>Felicidad</span>
+                        <strong id="happiness-value">70</strong>
+                    </div>
+
+                    <div class="bar">
+                        <div
+                            id="happiness-bar"
+                            class="bar-fill happiness"
+                        ></div>
+                    </div>
+                </div>
+
+
+                <div class="stat">
+                    <div class="stat-top">
+                        <span>Energía</span>
+                        <strong id="energy-value">80</strong>
+                    </div>
+
+                    <div class="bar">
+                        <div
+                            id="energy-bar"
+                            class="bar-fill energy"
+                        ></div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="separator"></div>
+
+
+            <div class="stat-grid">
+
+                <div class="small-stat">
+                    <span>Inteligencia</span>
+                    <strong id="intelligence-value">
+                        40
+                    </strong>
+                </div>
+
+                <div class="small-stat">
+                    <span>Confianza</span>
+                    <strong id="confidence-value">
+                        50
+                    </strong>
+                </div>
+
+                <div class="small-stat">
+                    <span>Nerd</span>
+                    <strong id="nerd-value">
+                        60
+                    </strong>
+                </div>
+
+                <div class="small-stat">
+                    <span>Confianza en ti</span>
+                    <strong id="trust-value">
+                        50
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div class="separator"></div>
+
+
+            <!-- =====================================
+                 ACCIONES
+            ====================================== -->
+
+            <div id="quick-actions">
+
+                <button
+                    class="action-button"
+                    data-action="breakfast"
+                >
+                    <span class="action-icon">+</span>
+                    Preparar comida
+                </button>
+
+                <button
+                    class="action-button"
+                    data-action="talk"
+                >
+                    <span class="action-icon">◉</span>
+                    Hablar
+                </button>
+
+                <button
+                    class="action-button"
+                    data-action="play"
+                >
+                    <span class="action-icon">▶</span>
+                    Jugar
+                </button>
+
+                <button
+                    class="action-button"
+                    data-action="study"
+                >
+                    <span class="action-icon">□</span>
+                    Estudiar
                 </button>
 
             </div>
 
-        </section>
 
-        <aside id="stats">
+            <div class="separator"></div>
 
-            <h2>ARTURITO</h2>
 
-            <p>Edad: <span id="age">—</span></p>
+            <!-- =====================================
+                 RELACIÓN
+            ====================================== -->
 
-            <div class="stat">
-                <span>Hambre</span>
-                <b id="hunger">—</b>
-            </div>
+            <div class="relationship">
 
-            <div class="stat">
-                <span>Felicidad</span>
-                <b id="happiness">—</b>
-            </div>
+                <div class="relationship-title">
+                    RELACIÓN
+                </div>
 
-            <div class="stat">
-                <span>Inteligencia</span>
-                <b id="intelligence">—</b>
-            </div>
+                <div class="relationship-row">
+                    <span>Afecto</span>
+                    <strong id="affection-value">50</strong>
+                </div>
 
-            <div class="stat">
-                <span>Estupidez</span>
-                <b id="stupidity">—</b>
-            </div>
+                <div class="relationship-row">
+                    <span>Respeto</span>
+                    <strong id="respect-value">40</strong>
+                </div>
 
-            <div class="money">
-                Dinero:
-                $<span id="money">—</span>
+                <div class="relationship-row">
+                    <span>Molestia</span>
+                    <strong id="annoyance-value">20</strong>
+                </div>
+
             </div>
 
         </aside>
 
+
+        <!-- =========================================
+             MENÚ
+        ========================================== -->
+
+        <div
+            id="menu-overlay"
+            class="overlay hidden"
+        >
+
+            <div class="menu-window">
+
+                <div class="menu-title">
+                    PAUSA
+                </div>
+
+                <button id="save-button">
+                    GUARDAR PARTIDA
+                </button>
+
+                <button id="inventory-button">
+                    INVENTARIO
+                </button>
+
+                <button id="close-menu-button">
+                    CONTINUAR
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             INVENTARIO
+        ========================================== -->
+
+        <div
+            id="inventory-overlay"
+            class="overlay hidden"
+        >
+
+            <div class="inventory-window">
+
+                <div class="menu-title">
+                    INVENTARIO
+                </div>
+
+                <div id="inventory-list">
+                    <div class="empty-inventory">
+                        No tienes objetos.
+                    </div>
+                </div>
+
+                <button id="close-inventory-button">
+                    VOLVER
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             FINAL
+        ========================================== -->
+
+        <div
+            id="ending-screen"
+            class="overlay hidden"
+        >
+
+            <div class="ending-window">
+
+                <div class="ending-small">
+                    CRÍA UN ARTURITO
+                </div>
+
+                <h1 id="ending-title">
+                    ARTURITO
+                </h1>
+
+                <p id="ending-text">
+                    ...
+                </p>
+
+                <button id="restart-button">
+                    VOLVER A EMPEZAR
+                </button>
+
+            </div>
+
+        </div>
+
     </main>
 
-    <script type="module" src="js/main.js"></script>
+
+    <!-- =========================================
+         MOTOR
+    ========================================== -->
+
+    <script
+        type="module"
+        src="js/main.js"
+    ></script>
 
 </body>
 </html>
