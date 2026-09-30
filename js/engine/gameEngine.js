@@ -1,127 +1,71 @@
-"use strict";
-
 import { DialogueEngine } from "./dialogueEngine.js";
 import { SceneEngine } from "./sceneEngine.js";
-import { updateMood } from "../character.js";
-import { saveGame } from "../save.js";
+import { scenes } from "../scenes.js";
 
 export class GameEngine {
 
     constructor(options = {}) {
 
-        this.scenes =
-            options.scenes ?? {};
+        this.dialogue = new DialogueEngine({
+            speed: options.speed || 25,
 
-        /*
-         * MOTOR DE DIÁLOGO
-         */
+            onSpeaker: speaker => {
+                options.onSpeaker?.(speaker);
+            },
 
-        this.dialogue =
-            new DialogueEngine({
+            onText: text => {
+                options.onText?.(text);
+            },
 
-                speed:
-                    options.textSpeed ?? 25,
+            onComplete: () => {
+                options.onDialogueComplete?.();
+            }
+        });
 
-                onSpeaker:
-                    options.onSpeaker,
+        this.scene = new SceneEngine({
 
-                onText:
-                    options.onText,
+            scenes,
 
-                onComplete:
-                    () => {
+            speed: options.speed || 25,
 
-                        this.scene.advance();
-                    }
-            });
+            onSpeaker: speaker => {
+                options.onSpeaker?.(speaker);
+            },
 
+            onText: text => {
+                options.onText?.(text);
+            },
 
-        /*
-         * MOTOR DE ESCENAS
-         */
+            onChoices: (choices, node) => {
+                options.onChoices?.(choices, node);
+            },
 
-        this.scene =
-            new SceneEngine({
+            onAction: (action, data) => {
+                options.onAction?.(action, data);
+            },
 
-                scenes:
-                    this.scenes,
+            onSceneStart: (scene, id) => {
+                options.onSceneStart?.(scene, id);
+            },
 
-                dialogue:
-                    this.dialogue,
-
-                onSceneStart:
-                    options.onSceneStart,
-
-                onSceneEnd:
-                    options.onSceneEnd,
-
-                onChoices:
-                    options.onChoices,
-
-                onAction:
-                    options.onAction,
-
-                onEnd:
-                    options.onEnd
-            });
+            onSceneEnd: (scene, id) => {
+                options.onSceneEnd?.(scene, id);
+            }
+        });
     }
 
 
-    // =========================================
-    // INICIAR
-    // =========================================
-
-    start(scene) {
-
-        this.scene.go(scene);
-
-        this.update();
+    start(sceneId) {
+        return this.scene.go(sceneId);
     }
 
-
-    // =========================================
-    // ELECCIÓN
-    // =========================================
-
-    choose(index) {
-
-        this.scene.selectChoice(
-            index
-        );
-
-        this.update();
-    }
-
-
-    // =========================================
-    // AVANZAR
-    // =========================================
 
     advance() {
-
-        if (
-            this.dialogue.isTyping()
-        ) {
-
-            this.dialogue.advance();
-
-            return;
-        }
-
         this.scene.advance();
-
-        this.update();
     }
 
 
-    // =========================================
-    // ACTUALIZAR
-    // =========================================
-
-    update() {
-
-        updateMood();
-
-        saveGame();
+    choose(index) {
+        this.scene.selectChoice(index);
     }
 }
