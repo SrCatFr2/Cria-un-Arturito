@@ -1,401 +1,258 @@
-"use strict";
-
+import { DialogueEngine } from "./dialogueEngine.js";
+import { ChoiceEngine } from "./choiceEngine.js";
 import { checkCondition } from "./conditionEngine.js";
-import {
-    getAvailableChoices,
-    choose
-} from "./choiceEngine.js";
+import { applyEffects } from "./effectEngine.js";
 
 export class SceneEngine {
 
     constructor(options = {}) {
 
-        this.dialogue =
-            options.dialogue;
-
-        this.scenes =
-            options.scenes ?? {};
-
-        this.onSceneStart =
-            options.onSceneStart ??
-            (() => {});
-
-        this.onSceneEnd =
-            options.onSceneEnd ??
-            (() => {});
-
-        this.onChoices =
-            options.onChoices ??
-            (() => {});
-
-        this.onAction =
-            options.onAction ??
-            (() => {});
-
-        this.onEnd =
-            options.onEnd ??
-            (() => {});
-
-
+        this.scenes = options.scenes || {};
         this.currentScene = null;
-
         this.currentNode = null;
-
+        this.currentNodeId = null;
         this.waitingForChoice = false;
+
+        this.choiceEngine = new ChoiceEngine();
+
+        this.dialogue = new DialogueEngine({
+            speed: options.speed || 25,
+
+            onSpeaker: speaker => {
+                options.onSpeaker?.(speaker);
+            },
+
+            onText: text => {
+                options.onText?.(text);
+            },
+
+            onComplete: () => {
+                options.onDialogueComplete?.();
+            }
+        });
+
+        this.callbacks = options;
     }
 
 
-    // =========================================
-    // REGISTRAR ESCENAS
-    // =========================================
-
     register(id, scene) {
-
         this.scenes[id] = scene;
     }
 
 
-    // =========================================
-    // IR A ESCENA
-    // =========================================
+    go(sceneId) {
 
-    go(id) {
-
-        const scene =
-            this.scenes[id];
+        const scene = this.scenes[sceneId];
 
         if (!scene) {
-
-            console.error(
-                `Escena inexistente: ${id}`
-            );
-
-            return;
+            console.error(`Escena no encontrada: ${sceneId}`);
+            return false;
         }
 
-        /*
-         * Condición de escena
-         */
-
-        if (
-            scene.condition &&
-            !checkCondition(
-                scene.condition
-            )
-        ) {
+        if (scene.condition && !checkCondition(scene.condition)) {
 
             if (scene.fallback) {
-
-                this.go(
-                    scene.fallback
-                );
-
+                return this.go(scene.fallback);
             }
 
-            return;
+            return false;
         }
 
-
-        this.currentScene = id;
-
-        this.currentNode = null;
+        this.currentScene = {
+            id: sceneId,
+            ...scene
+        };
 
         this.waitingForChoice = false;
 
-        this.onSceneStart(
-            scene,
-            id
+        this.callbacks.onSceneStart?.(
+            this.currentScene,
+            sceneId
         );
 
+        const startId = scene.start;
 
-        /*
-         * Buscar primer nodo
-         */
-
-        const start =
-            scene.start ??
-            scene.nodes?.[0];
-
-
-        if (start) {
-
-            this.showNode(start);
-
-        } else {
-
-            this.finishScene();
+        if (!startId) {
+            console.error(`La escena "${sceneId}" no tiene start.`);
+            return false;
         }
+
+        return this.showNode(startId);
     }
 
 
-    // =========================================
-    // MOSTRAR NODO
-    // =========================================
+    showNode(nodeId) {
 
-    showNode(node) {
+        if (!this.currentScene) return false;
 
-        this.currentNode = node;
+        const node = this.currentScene.nodes?.[nodeId];
 
-        /*
-         * Nodo puede ser string
-         */
-
-        if (typeof node === "string") {
-
-            this.dialogue.start({
-                speaker:
-                    "ARTURITO",
-
-                text: node
-            });
-
-            return;
+        if (!node) {
+            console.error(
+                `Nodo "${nodeId}" no encontrado en "${this.currentScene.id}"`
+            );
+            return false;
         }
-
-
-        /*
-         * Nodo condicional
-         */
 
         if (
             node.condition &&
-            !checkCondition(
-                node.condition
-            )
+            !checkCondition(node.condition)
         ) {
 
             if (node.fallback) {
-
-                this.showNode(
-                    node.fallback
-                );
-
-            } else {
-
-                this.finishScene();
+                return this.showNode(node.fallback);
             }
 
-            return;
+            return this.advanceFromNode(node);
         }
 
+        this.currentNodeId = nodeId;
+        this.currentNode = node;
 
-        /*
-         * Nodo de acción
-         */
+        this.waitingForChoice = false;
+
+        if (node.effects) {
+            applyEffects(node.effects);
+        }
 
         if (node.action) {
-
-            this.onAction(
-                node.action
+            this.callbacks.onAction?.(
+                node.action,
+                node
             );
         }
 
+        if (node.dialogue) {
 
-        /*
-         * Nodo de diálogo
-         */
+            this.dialogue.start(node.dialogue);
 
-        if (
-            node.speaker ||
-            node.text
-        ) {
-
-            this.dialogue.start(node);
-
-            return;
+            return true;
         }
-
-
-        /*
-         * Nodo de choices
-         */
 
         if (node.choices) {
-
-            this.showChoices(
-                node.choices
-            );
-
-            return;
+            return this.showChoices(node.choices);
         }
 
+        if (node.end) {
+            return this.finishScene();
+        }
 
-        /*
-         * Nodo vacío
-         */
-
-        this.advance();
+        return this.advanceFromNode(node);
     }
 
-
-    // =========================================
-    // TERMINÓ DIÁLOGO
-    // =========================================
 
     advance() {
 
-        const node =
-            this.currentNode;
+        if (!this.currentNode) return;
 
-        if (!node) {
+        // Si todavía se está escribiendo,
+        // el primer click solo termina la escritura.
+        if (this.dialogue.isTyping()) {
+            this.dialogue.finishTyping();
             return;
         }
 
-
-        /*
-         * Si tiene elecciones
-         */
-
-        if (node.choices) {
-
-            this.showChoices(
-                node.choices
-            );
-
+        if (this.waitingForChoice) {
             return;
         }
 
-
-        /*
-         * Siguiente nodo
-         */
-
-        if (node.next) {
-
-            this.showNode(
-                node.next
-            );
-
-            return;
-        }
-
-
-        /*
-         * Terminar escena
-         */
-
-        this.finishScene();
+        this.advanceFromNode(this.currentNode);
     }
 
 
-    // =========================================
-    // ELECCIONES
-    // =========================================
+    advanceFromNode(node) {
+
+        if (node.next) {
+
+            const next = node.next;
+
+            if (next.startsWith("@")) {
+                return this.showNode(
+                    next.substring(1)
+                );
+            }
+
+            return this.go(next);
+        }
+
+        if (node.end) {
+            return this.finishScene();
+        }
+
+        return this.finishScene();
+    }
+
 
     showChoices(choices) {
 
         const available =
-            getAvailableChoices(
-                choices
-            );
+            this.choiceEngine.getAvailableChoices(choices);
 
         this.waitingForChoice = true;
 
-        this.onChoices(
-            available
+        this.callbacks.onChoices?.(
+            available,
+            this.currentNode
         );
+
+        return available;
     }
 
 
-    // =========================================
-    // ELEGIR
-    // =========================================
-
     selectChoice(index) {
 
-        if (!this.waitingForChoice) {
-            return;
-        }
+        if (!this.waitingForChoice) return;
 
-        const node =
-            this.currentNode;
-
-        const available =
-            getAvailableChoices(
-                node.choices ?? []
+        const choices =
+            this.choiceEngine.getAvailableChoices(
+                this.currentNode.choices
             );
 
-        const choice =
-            available[index];
+        const choice = choices[index];
 
-        if (!choice) {
-            return;
-        }
+        if (!choice) return;
 
         this.waitingForChoice = false;
 
         const result =
-            choose(choice);
-
-        /*
-         * Acción
-         */
+            this.choiceEngine.choose(choice);
 
         if (result.action) {
-
-            this.onAction(
-                result.action
+            this.callbacks.onAction?.(
+                result.action,
+                choice
             );
         }
 
-        /*
-         * Final
-         */
-
         if (result.end) {
-
-            this.onEnd();
-
-            return;
+            return this.finishScene();
         }
-
-        /*
-         * Siguiente escena
-         */
 
         if (result.next) {
 
-            /*
-             * Si empieza por @ significa
-             * que es un nodo de la escena actual.
-             */
-
-            if (
-                result.next.startsWith("@")
-            ) {
-
-                this.showNode(
-                    result.next.slice(1)
-                );
-
-            } else {
-
-                this.go(
-                    result.next
+            if (result.next.startsWith("@")) {
+                return this.showNode(
+                    result.next.substring(1)
                 );
             }
 
-            return;
+            return this.go(result.next);
         }
-
-        this.finishScene();
     }
 
 
-    // =========================================
-    // FIN
-    // =========================================
-
     finishScene() {
 
-        const scene =
-            this.scenes[
-                this.currentScene
-            ];
+        const scene = this.currentScene;
 
-        this.onSceneEnd(
+        this.callbacks.onSceneEnd?.(
             scene,
-            this.currentScene
+            scene?.id
         );
+
+        this.currentScene = null;
+        this.currentNode = null;
+        this.currentNodeId = null;
+        this.waitingForChoice = false;
     }
 }
