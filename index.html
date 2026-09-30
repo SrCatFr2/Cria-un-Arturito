@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Cría un Arturito</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <main id="game">
+
+        <section id="scene">
+
+            <div id="background"></div>
+
+            <div id="character">
+                <!-- Aquí posteriormente irán tus sprites -->
+            </div>
+
+            <div id="dialogue-box">
+
+                <div id="speaker"></div>
+
+                <div id="dialogue-text"></div>
+
+                <div id="choices"></div>
+
+                <button id="continue-btn">
+                    Continuar
+                </button>
+
+            </div>
+
+        </section>
+
+        <aside id="stats">
+
+            <h2>ARTURITO</h2>
+
+            <p>Edad: <span id="age">—</span></p>
+
+            <div class="stat">
+                <span>Hambre</span>
+                <b id="hunger">—</b>
+            </div>
+
+            <div class="stat">
+                <span>Felicidad</span>
+                <b id="happiness">—</b>
+            </div>
+
+            <div class="stat">
+                <span>Inteligencia</span>
+                <b id="intelligence">—</b>
+            </div>
+
+            <div class="stat">
+                <span>Estupidez</span>
+                <b id="stupidity">—</b>
+            </div>
+
+            <div class="money">
+                Dinero:
+                $<span id="money">—</span>
+            </div>
+
+        </aside>
+
+    </main>
+
+    <script type="module" src="js/main.js"></script>
+
+</body>
+</html>
